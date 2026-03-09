@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/travel-unit-converter/',
   plugins: [
     react(),
     VitePWA({
@@ -33,8 +34,8 @@ export default defineConfig({
         theme_color: '#141414',
         background_color: '#141414',
         display: 'standalone',
-        start_url: '/',
-        scope: '/',
+        start_url: '/travel-unit-converter/',
+        scope: '/travel-unit-converter/',
         icons: [
           {
             src: '/vite.svg',
