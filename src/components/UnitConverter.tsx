@@ -19,7 +19,7 @@ interface Props {
   loading: boolean;
 }
 
-const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates, loading }) => {
+const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exchangeRates, loading }) => {
   const [inputValue, setInputValue] = useState('');
   const [result, setResult] = useState<number | null>(null);
   const [direction, setDirection] = useState<'toJp' | 'fromJp'>('toJp');

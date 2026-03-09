@@ -11,9 +11,9 @@ export interface UnitSet {
   [key: string]: ConversionUnit;
 }
 
-export interface CountryUnits {
-  [key in UnitCategory]?: UnitSet;
-}
+export type CountryUnits = {
+  [K in UnitCategory]?: UnitSet;
+};
 
 export interface Country {
   id: string;
