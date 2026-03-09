@@ -36,20 +36,28 @@ const fetchRatesFromAPI = async (baseCurrency: string) => {
   }
 };
 
-export const getExchangeRates = async (baseCurrency: string = 'JPY') => {
+export interface ExchangeRatesResult {
+  rates: { [key: string]: number };
+  updatedAt: number | null;
+}
+
+export const getExchangeRates = async (baseCurrency: string = 'JPY'): Promise<ExchangeRatesResult> => {
   const cached = getCachedRates();
-  if (cached) return cached.rates;
+  if (cached) return { rates: cached.rates, updatedAt: cached.timestamp };
+
   const rates = await fetchRatesFromAPI(baseCurrency);
   if (rates) {
     setCachedRates(rates);
-    return rates;
+    return { rates, updatedAt: Date.now() };
   }
-  return getDefaultRates();
+
+  return { rates: getDefaultRates(), updatedAt: null };
 };
 
+// 1 JPY = X 各通貨（API失敗時のフォールバック、概算値）
 const getDefaultRates = () => ({
   'USD': 0.0067,
-  'KRW': 0.85,
+  'KRW': 9.4,
   'VND': 155,
   'THB': 0.24,
   'TWD': 0.21,
@@ -60,7 +68,7 @@ const getDefaultRates = () => ({
 
 export const convertCurrency = async (amount: number, fromCurrency: string, toCurrency: string): Promise<number> => {
   if (fromCurrency === toCurrency) return amount;
-  const rates = await getExchangeRates('JPY');
+  const { rates } = await getExchangeRates('JPY');
   const amountInJPY = amount / (rates[fromCurrency] || 1);
   return amountInJPY * (rates[toCurrency] || 1);
 };

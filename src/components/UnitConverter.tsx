@@ -4,7 +4,7 @@ import { convertCurrency } from '../services/exchangeRateService';
 
 const JAPANESE_UNITS: { [key in UnitCategory]: { name: string; symbol: string } } = {
   currency: { name: '日本円', symbol: '¥' },
-  distance: { name: 'キロメートル', symbol: 'km' },
+  distance: { name: 'メートル', symbol: 'm' },
   weight: { name: 'キログラム', symbol: 'kg' },
   temperature: { name: '摂氏', symbol: '°C' },
   length: { name: 'メートル', symbol: 'm' },
@@ -22,24 +22,21 @@ interface Props {
 const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates, loading }) => {
   const [inputValue, setInputValue] = useState('');
   const [result, setResult] = useState<number | null>(null);
+  const [direction, setDirection] = useState<'toJp' | 'fromJp'>('toJp');
   const units = country.units[category];
 
   const unitKeys = units ? Object.keys(units) : [];
-  const [fromUnit, setFromUnit] = useState('');
+  const [selectedUnit, setSelectedUnit] = useState('');
 
   useEffect(() => {
     if (unitKeys.length > 0) {
-      setFromUnit(unitKeys[0]);
+      setSelectedUnit(unitKeys[0]);
     }
   }, [country.id, category]);
 
-  if (!units || unitKeys.length === 0) {
-    return <div className="converter-error">この項目に対応する単位がありません</div>;
-  }
-
-  const jpUnit = JAPANESE_UNITS[category];
-
   useEffect(() => {
+    if (!units || unitKeys.length === 0) return;
+
     const performConversion = async () => {
       if (!inputValue || isNaN(Number(inputValue))) {
         setResult(null);
@@ -47,30 +44,72 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates, load
       }
 
       const num = Number(inputValue);
-      const fromUnitData = units[fromUnit];
+      const unitData = units[selectedUnit];
 
-      if (!fromUnitData) return;
+      if (!unitData) return;
 
       if (category === 'currency') {
-        const converted = await convertCurrency(num, fromUnit.toUpperCase(), 'JPY');
-        setResult(converted);
+        if (direction === 'toJp') {
+          const converted = await convertCurrency(num, selectedUnit.toUpperCase(), 'JPY');
+          setResult(converted);
+        } else {
+          const converted = await convertCurrency(num, 'JPY', selectedUnit.toUpperCase());
+          setResult(converted);
+        }
       } else {
-        const baseValue = fromUnitData.toBase(num);
-        setResult(baseValue);
+        if (direction === 'toJp') {
+          const baseValue = unitData.toBase(num);
+          setResult(baseValue);
+        } else {
+          const baseValue = num;
+          setResult(unitData.fromBase(baseValue));
+        }
       }
     };
 
     performConversion();
-  }, [inputValue, fromUnit, category, units]);
+  }, [inputValue, selectedUnit, direction, category, units]);
+
+  if (!units || unitKeys.length === 0) {
+    return <div className="converter-error">この項目に対応する単位がありません</div>;
+  }
+
+  const jpUnit = JAPANESE_UNITS[category];
 
   const formatResult = (value: number) => {
-    if (category === 'currency' || category === 'temperature') return value.toFixed(2);
-    if (value >= 1000 || (value < 0.01 && value > 0)) return value.toExponential(2);
-    return value.toFixed(2);
+    if (category === 'currency') {
+      return value.toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    if (category === 'temperature') {
+      return value.toFixed(1);
+    }
+    if (Math.abs(value) >= 1000 || (Math.abs(value) < 0.01 && value !== 0)) {
+      return value.toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+    }
+    return value.toLocaleString('ja-JP', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
+
+  const isToJp = direction === 'toJp';
 
   return (
     <div className="converter-container">
+      <div className="converter-direction">
+        <button
+          type="button"
+          className={`converter-direction-btn ${isToJp ? 'active' : ''}`}
+          onClick={() => setDirection('toJp')}
+        >
+          現地 → 日本
+        </button>
+        <button
+          type="button"
+          className={`converter-direction-btn ${!isToJp ? 'active' : ''}`}
+          onClick={() => setDirection('fromJp')}
+        >
+          日本 → 現地
+        </button>
+      </div>
+
       <div className="converter-form">
         <div className="input-group">
           <input
@@ -80,28 +119,57 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates, load
             placeholder="数値を入力"
             className="converter-input"
           />
-          <select value={fromUnit} onChange={(e) => setFromUnit(e.target.value)} className="converter-select">
-            {unitKeys.map((key) => (
-              <option key={key} value={key}>
-                {units[key].name} ({units[key].symbol})
-              </option>
-            ))}
-          </select>
+          {isToJp ? (
+            <select
+              value={selectedUnit}
+              onChange={(e) => setSelectedUnit(e.target.value)}
+              className="converter-select"
+            >
+              {unitKeys.map((key) => (
+                <option key={key} value={key}>
+                  {units[key].name} ({units[key].symbol})
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="converter-fixed-unit">
+              {jpUnit.name} ({jpUnit.symbol})
+            </div>
+          )}
         </div>
 
-        <div className="converter-arrow">→</div>
+        <div className="converter-arrow" aria-hidden="true">→</div>
 
         <div className="output-group">
           <div className="converter-output">
             {loading ? (
               <span>読込中...</span>
             ) : result !== null ? (
-              <span>{formatResult(result)} {jpUnit.symbol}</span>
+              <span>
+                {formatResult(result)}{' '}
+                {isToJp ? jpUnit.symbol : units[selectedUnit].symbol}
+              </span>
             ) : (
               <span>-</span>
             )}
           </div>
-          <div className="converter-fixed-unit">{jpUnit.name} ({jpUnit.symbol})</div>
+          {isToJp ? (
+            <div className="converter-fixed-unit">
+              {jpUnit.name} ({jpUnit.symbol})
+            </div>
+          ) : (
+            <select
+              value={selectedUnit}
+              onChange={(e) => setSelectedUnit(e.target.value)}
+              className="converter-select"
+            >
+              {unitKeys.map((key) => (
+                <option key={key} value={key}>
+                  {units[key].name} ({units[key].symbol})
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
     </div>

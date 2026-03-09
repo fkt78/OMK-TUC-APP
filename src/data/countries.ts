@@ -12,7 +12,7 @@ export const COUNTRIES: { [key: string]: Country } = {
         usd: { name: 'US Dollar', symbol: '$', toBase: (v) => v, fromBase: (v) => v }
       },
       distance: {
-        mile: { name: 'Mile', symbol: 'mi', toBase: (v) => v * 1.60934, fromBase: (v) => v / 1.60934 },
+        mile: { name: 'Mile', symbol: 'mi', toBase: (v) => v * 1609.34, fromBase: (v) => v / 1609.34 },
         foot: { name: 'Foot', symbol: 'ft', toBase: (v) => v * 0.3048, fromBase: (v) => v / 0.3048 },
         yard: { name: 'Yard', symbol: 'yd', toBase: (v) => v * 0.9144, fromBase: (v) => v / 0.9144 }
       },
@@ -41,9 +41,11 @@ export const COUNTRIES: { [key: string]: Country } = {
       currency: {
         krw: { name: 'Korean Won', symbol: '₩', toBase: (v) => v, fromBase: (v) => v }
       },
-      distance: {},
-      weight: {},
-      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } }
+      distance: { km: { name: 'キロメートル', symbol: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 } },
+      weight: { kg: { name: 'キログラム', symbol: 'kg', toBase: (v) => v, fromBase: (v) => v } },
+      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } },
+      volume: { liter: { name: 'リットル', symbol: 'L', toBase: (v) => v, fromBase: (v) => v } },
+      speed: { kmh: { name: 'km/h', symbol: 'km/h', toBase: (v) => v, fromBase: (v) => v } }
     }
   },
   vietnam: {
@@ -56,9 +58,11 @@ export const COUNTRIES: { [key: string]: Country } = {
       currency: {
         vnd: { name: 'Vietnamese Dong', symbol: '₫', toBase: (v) => v, fromBase: (v) => v }
       },
-      distance: {},
-      weight: {},
-      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } }
+      distance: { km: { name: 'キロメートル', symbol: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 } },
+      weight: { kg: { name: 'キログラム', symbol: 'kg', toBase: (v) => v, fromBase: (v) => v } },
+      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } },
+      volume: { liter: { name: 'リットル', symbol: 'L', toBase: (v) => v, fromBase: (v) => v } },
+      speed: { kmh: { name: 'km/h', symbol: 'km/h', toBase: (v) => v, fromBase: (v) => v } }
     }
   },
   thailand: {
@@ -71,9 +75,11 @@ export const COUNTRIES: { [key: string]: Country } = {
       currency: {
         thb: { name: 'Thai Baht', symbol: '฿', toBase: (v) => v, fromBase: (v) => v }
       },
-      distance: {},
-      weight: {},
-      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } }
+      distance: { km: { name: 'キロメートル', symbol: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 } },
+      weight: { kg: { name: 'キログラム', symbol: 'kg', toBase: (v) => v, fromBase: (v) => v } },
+      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } },
+      volume: { liter: { name: 'リットル', symbol: 'L', toBase: (v) => v, fromBase: (v) => v } },
+      speed: { kmh: { name: 'km/h', symbol: 'km/h', toBase: (v) => v, fromBase: (v) => v } }
     }
   },
   taiwan: {
@@ -86,9 +92,11 @@ export const COUNTRIES: { [key: string]: Country } = {
       currency: {
         twd: { name: 'New Taiwan Dollar', symbol: 'NT$', toBase: (v) => v, fromBase: (v) => v }
       },
-      distance: {},
-      weight: {},
-      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } }
+      distance: { km: { name: 'キロメートル', symbol: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 } },
+      weight: { kg: { name: 'キログラム', symbol: 'kg', toBase: (v) => v, fromBase: (v) => v } },
+      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } },
+      volume: { liter: { name: 'リットル', symbol: 'L', toBase: (v) => v, fromBase: (v) => v } },
+      speed: { kmh: { name: 'km/h', symbol: 'km/h', toBase: (v) => v, fromBase: (v) => v } }
     }
   },
   china: {
@@ -101,9 +109,11 @@ export const COUNTRIES: { [key: string]: Country } = {
       currency: {
         cny: { name: 'Chinese Yuan', symbol: '¥', toBase: (v) => v, fromBase: (v) => v }
       },
-      distance: {},
-      weight: {},
-      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } }
+      distance: { km: { name: 'キロメートル', symbol: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 } },
+      weight: { kg: { name: 'キログラム', symbol: 'kg', toBase: (v) => v, fromBase: (v) => v } },
+      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } },
+      volume: { liter: { name: 'リットル', symbol: 'L', toBase: (v) => v, fromBase: (v) => v } },
+      speed: { kmh: { name: 'km/h', symbol: 'km/h', toBase: (v) => v, fromBase: (v) => v } }
     }
   },
   australia: {
@@ -116,9 +126,11 @@ export const COUNTRIES: { [key: string]: Country } = {
       currency: {
         aud: { name: 'Australian Dollar', symbol: 'A$', toBase: (v) => v, fromBase: (v) => v }
       },
-      distance: {},
-      weight: {},
-      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } }
+      distance: { km: { name: 'キロメートル', symbol: 'km', toBase: (v) => v * 1000, fromBase: (v) => v / 1000 } },
+      weight: { kg: { name: 'キログラム', symbol: 'kg', toBase: (v) => v, fromBase: (v) => v } },
+      temperature: { celsius: { name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (v) => v } },
+      volume: { liter: { name: 'リットル', symbol: 'L', toBase: (v) => v, fromBase: (v) => v } },
+      speed: { kmh: { name: 'km/h', symbol: 'km/h', toBase: (v) => v, fromBase: (v) => v } }
     }
   }
 };
