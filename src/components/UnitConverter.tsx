@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { Country, UnitCategory } from '../types/index';
 import { convertCurrency } from '../services/exchangeRateService';
 
@@ -21,7 +21,7 @@ interface Props {
 
 const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exchangeRates, loading }) => {
   const [inputValue, setInputValue] = useState('');
-  const [result, setResult] = useState<number | null>(null);
+  const [currencyResult, setCurrencyResult] = useState<number | null>(null);
   const [direction, setDirection] = useState<'toJp' | 'fromJp'>('toJp');
   const units = country.units[category];
 
@@ -32,46 +32,49 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
   // 国またはカテゴリが変わったら入力・結果・選択単位をリセット
   useEffect(() => {
     setInputValue('');
-    setResult(null);
+    setCurrencyResult(null);
     if (unitKeys.length > 0) {
       setSelectedUnit(unitKeys[0]);
     }
   }, [country.id, category]);
 
-  useEffect(() => {
-    if (!units || unitKeys.length === 0) return;
-
+  // 通貨以外はrenderと同時に直接計算（useEffectを使わないことで表示ズレをなくす）
+  const nonCurrencyResult = useMemo(() => {
+    if (category === 'currency') return null;
+    if (!units || unitKeys.length === 0) return null;
     const trimmed = inputValue.trim();
-    if (!trimmed || isNaN(Number(trimmed))) {
-      setResult(null);
-      return;
-    }
-
+    if (!trimmed || isNaN(Number(trimmed))) return null;
     const num = Number(trimmed);
     const unit = safeSelectedUnit || unitKeys[0];
     const unitData = unit ? units[unit] : null;
+    if (!unitData) return null;
+    return direction === 'toJp' ? unitData.toBase(num) : unitData.fromBase(num);
+  }, [inputValue, safeSelectedUnit, direction, category, units, unitKeys]);
 
-    if (!unitData) return;
-
-    if (category === 'currency') {
-      const convert = async () => {
-        if (direction === 'toJp') {
-          const converted = await convertCurrency(num, unit.toUpperCase(), 'JPY');
-          setResult(converted);
-        } else {
-          const converted = await convertCurrency(num, 'JPY', unit.toUpperCase());
-          setResult(converted);
-        }
-      };
-      convert();
-    } else {
-      if (direction === 'toJp') {
-        setResult(unitData.toBase(num));
-      } else {
-        setResult(unitData.fromBase(num));
-      }
+  // 通貨のみ非同期でAPIから換算
+  useEffect(() => {
+    if (category !== 'currency') return;
+    if (!units || unitKeys.length === 0) return;
+    const trimmed = inputValue.trim();
+    if (!trimmed || isNaN(Number(trimmed))) {
+      setCurrencyResult(null);
+      return;
     }
-  }, [inputValue, safeSelectedUnit, direction, category, units, unitKeys.length, unitKeys[0]]);
+    const num = Number(trimmed);
+    const unit = safeSelectedUnit || unitKeys[0];
+    const convert = async () => {
+      if (direction === 'toJp') {
+        const converted = await convertCurrency(num, unit.toUpperCase(), 'JPY');
+        setCurrencyResult(converted);
+      } else {
+        const converted = await convertCurrency(num, 'JPY', unit.toUpperCase());
+        setCurrencyResult(converted);
+      }
+    };
+    convert();
+  }, [inputValue, safeSelectedUnit, direction, category, units]);
+
+  const result = category === 'currency' ? currencyResult : nonCurrencyResult;
 
   if (!units || unitKeys.length === 0) {
     return <div className="converter-error">この項目に対応する単位がありません</div>;
