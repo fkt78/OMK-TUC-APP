@@ -15,6 +15,12 @@ const GasolineMode: React.FC<Props> = ({ country, loading }) => {
 
   const isUSA = country.id === 'usa';
 
+  // 国が変わったら入力値をリセット
+  useEffect(() => {
+    setPriceInput('');
+    setResultYenPerL(null);
+  }, [country.id]);
+
   useEffect(() => {
     const calculate = async () => {
       const num = Number(priceInput);

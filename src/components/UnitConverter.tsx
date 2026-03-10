@@ -29,7 +29,10 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
   const [selectedUnit, setSelectedUnit] = useState('');
   const safeSelectedUnit = selectedUnit && units?.[selectedUnit] ? selectedUnit : unitKeys[0] ?? '';
 
+  // 国またはカテゴリが変わったら入力・結果・選択単位をリセット
   useEffect(() => {
+    setInputValue('');
+    setResult(null);
     if (unitKeys.length > 0) {
       setSelectedUnit(unitKeys[0]);
     }
