@@ -84,6 +84,11 @@ export const convertCurrency = async (amount: number, fromCurrency: string, toCu
   return result;
 };
 
+/** 1 fromCurrency = X toCurrency のレートを返す（表示用） */
+export const getRateForDisplay = async (fromCurrency: string, toCurrency: string): Promise<number> => {
+  return convertCurrency(1, fromCurrency, toCurrency);
+};
+
 export const clearCache = () => {
   try {
     localStorage.removeItem(CACHE_KEY);

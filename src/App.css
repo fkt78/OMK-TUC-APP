@@ -255,7 +255,14 @@ body {
 .gasoline-mode-result {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--netflix-white);
+}
+
+.gasoline-mode-rate {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--netflix-gray-light);
+  margin-top: 0.25rem;
 }
 
 .gasoline-mode-loading,
@@ -268,6 +275,108 @@ body {
   margin-top: 0.75rem;
   font-size: 0.75rem;
   color: var(--netflix-gray);
+}
+
+/* Calculator */
+.calculator-section {
+  margin-top: 2rem;
+}
+
+.calculator-toggle {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: var(--netflix-card);
+  color: var(--netflix-gray-light);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.calculator-toggle:hover {
+  background: var(--netflix-card-hover);
+  color: var(--netflix-white);
+}
+
+.calculator-toggle.active {
+  border-color: var(--netflix-red);
+  color: var(--netflix-red);
+}
+
+.calculator {
+  background: var(--netflix-dark);
+  border-radius: 4px;
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: 280px;
+}
+
+.calculator h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--netflix-white);
+  margin-bottom: 1rem;
+}
+
+.calculator-display {
+  background: var(--netflix-black);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: right;
+  margin-bottom: 1rem;
+  min-height: 2.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.calculator-btn {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--netflix-card);
+  color: var(--netflix-white);
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calculator-btn:hover {
+  background: var(--netflix-card-hover);
+}
+
+.calculator-btn:active {
+  transform: scale(0.97);
+}
+
+.calculator-btn-op {
+  background: rgba(229, 9, 20, 0.3);
+  color: var(--netflix-white);
+}
+
+.calculator-btn-op:hover {
+  background: var(--netflix-red);
+}
+
+.calculator-btn-equals {
+  background: var(--netflix-red);
+  color: white;
+}
+
+.calculator-btn-equals:hover {
+  background: var(--netflix-red-hover);
+}
+
+.calculator-btn-zero {
+  grid-column: span 2;
 }
 
 .converter-container {

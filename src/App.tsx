@@ -5,6 +5,7 @@ import { getExchangeRates } from './services/exchangeRateService';
 import CountrySelector from './components/CountrySelector';
 import ConversionStepBlock from './components/ConversionStepBlock';
 import GasolineMode from './components/GasolineMode';
+import Calculator from './components/Calculator';
 import LegalModal, { type LegalType } from './components/LegalModal';
 import packageJson from '../package.json';
 import './App.css';
@@ -28,6 +29,7 @@ function App() {
   const [ratesUpdatedAt, setRatesUpdatedAt] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [legalModal, setLegalModal] = useState<LegalType | null>(null);
+  const [showCalculator, setShowCalculator] = useState(false);
 
   const getAvailableCategories = useCallback((): UnitCategory[] => {
     if (!selectedCountry) return [];
@@ -113,6 +115,17 @@ function App() {
         )}
 
         <GasolineMode country={selectedCountry} loading={loading} />
+
+        <div className="calculator-section">
+          <button
+            type="button"
+            className={`calculator-toggle ${showCalculator ? 'active' : ''}`}
+            onClick={() => setShowCalculator((v) => !v)}
+          >
+            {showCalculator ? '電卓を閉じる' : '電卓を開く'}
+          </button>
+          {showCalculator && <Calculator />}
+        </div>
       </main>
 
       <footer className="app-footer">

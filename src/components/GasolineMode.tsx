@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Country } from '../types/index';
-import { convertCurrency } from '../services/exchangeRateService';
+import { convertCurrency, getRateForDisplay } from '../services/exchangeRateService';
 
 const US_GALLON_TO_LITER = 3.785411784; // 1 US gallon = 3.785411784 L
 
@@ -12,6 +12,7 @@ interface Props {
 const GasolineMode: React.FC<Props> = ({ country, loading }) => {
   const [priceInput, setPriceInput] = useState('');
   const [resultYenPerL, setResultYenPerL] = useState<number | null>(null);
+  const [rateToJpy, setRateToJpy] = useState<number | null>(null); // 1 外貨 = rateToJpy 円
 
   const isUSA = country.id === 'usa';
 
@@ -19,6 +20,7 @@ const GasolineMode: React.FC<Props> = ({ country, loading }) => {
   useEffect(() => {
     setPriceInput('');
     setResultYenPerL(null);
+    setRateToJpy(null);
   }, [country.id]);
 
   useEffect(() => {
@@ -26,16 +28,25 @@ const GasolineMode: React.FC<Props> = ({ country, loading }) => {
       const num = Number(priceInput);
       if (!priceInput || isNaN(num) || num <= 0) {
         setResultYenPerL(null);
+        setRateToJpy(null);
         return;
       }
 
       if (isUSA) {
         const usdPerLiter = num / US_GALLON_TO_LITER;
-        const yenPerLiter = await convertCurrency(usdPerLiter, 'USD', 'JPY');
+        const [yenPerLiter, usdToJpy] = await Promise.all([
+          convertCurrency(usdPerLiter, 'USD', 'JPY'),
+          getRateForDisplay('USD', 'JPY'),
+        ]);
         setResultYenPerL(yenPerLiter);
+        setRateToJpy(usdToJpy);
       } else {
-        const yenPerLiter = await convertCurrency(num, country.currencyCode, 'JPY');
+        const [yenPerLiter, rate] = await Promise.all([
+          convertCurrency(num, country.currencyCode, 'JPY'),
+          getRateForDisplay(country.currencyCode, 'JPY'),
+        ]);
         setResultYenPerL(yenPerLiter);
+        setRateToJpy(rate);
       }
     };
 
@@ -91,6 +102,11 @@ const GasolineMode: React.FC<Props> = ({ country, loading }) => {
             <span>
               → 1リットルあたり 約{' '}
               {Math.round(resultYenPerL).toLocaleString('ja-JP')} 円
+              {rateToJpy !== null && (
+                <span className="gasoline-mode-rate">
+                  （1{isUSA ? 'ドル' : country.currencyCode}＝約{rateToJpy >= 1 ? Math.round(rateToJpy).toLocaleString('ja-JP') : rateToJpy.toFixed(2)}円）
+                </span>
+              )}
             </span>
           ) : (
             <span className="gasoline-mode-placeholder">-</span>
