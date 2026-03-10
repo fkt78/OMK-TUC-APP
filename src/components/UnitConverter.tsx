@@ -27,6 +27,7 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
 
   const unitKeys = units ? Object.keys(units) : [];
   const [selectedUnit, setSelectedUnit] = useState('');
+  const safeSelectedUnit = selectedUnit && units?.[selectedUnit] ? selectedUnit : unitKeys[0] ?? '';
 
   useEffect(() => {
     if (unitKeys.length > 0) {
@@ -38,22 +39,23 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
     if (!units || unitKeys.length === 0) return;
 
     const performConversion = async () => {
-      if (!inputValue || isNaN(Number(inputValue))) {
+      if (!inputValue || inputValue.trim() === '' || isNaN(Number(inputValue))) {
         setResult(null);
         return;
       }
 
       const num = Number(inputValue);
-      const unitData = units[selectedUnit];
+      const unit = safeSelectedUnit || unitKeys[0];
+      const unitData = unit ? units[unit] : null;
 
       if (!unitData) return;
 
       if (category === 'currency') {
         if (direction === 'toJp') {
-          const converted = await convertCurrency(num, selectedUnit.toUpperCase(), 'JPY');
+          const converted = await convertCurrency(num, unit.toUpperCase(), 'JPY');
           setResult(converted);
         } else {
-          const converted = await convertCurrency(num, 'JPY', selectedUnit.toUpperCase());
+          const converted = await convertCurrency(num, 'JPY', unit.toUpperCase());
           setResult(converted);
         }
       } else {
@@ -68,7 +70,7 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
     };
 
     performConversion();
-  }, [inputValue, selectedUnit, direction, category, units]);
+  }, [inputValue, safeSelectedUnit, unitKeys, direction, category, units]);
 
   if (!units || unitKeys.length === 0) {
     return <div className="converter-error">この項目に対応する単位がありません</div>;
@@ -113,15 +115,19 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
       <div className="converter-form">
         <div className="input-group">
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === '' || /^-?\d*\.?\d*$/.test(v)) setInputValue(v);
+            }}
             placeholder="数値を入力"
             className="converter-input"
           />
           {isToJp ? (
             <select
-              value={selectedUnit}
+              value={safeSelectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value)}
               className="converter-select"
             >
@@ -147,7 +153,7 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
             ) : result !== null ? (
               <span>
                 {formatResult(result)}{' '}
-                {isToJp ? jpUnit.symbol : units[selectedUnit].symbol}
+                {isToJp ? jpUnit.symbol : (units[safeSelectedUnit]?.symbol ?? '-')}
               </span>
             ) : (
               <span>-</span>
@@ -159,7 +165,7 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
             </div>
           ) : (
             <select
-              value={selectedUnit}
+              value={safeSelectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value)}
               className="converter-select"
             >

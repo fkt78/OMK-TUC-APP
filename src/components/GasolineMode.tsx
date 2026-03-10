@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { Country } from '../types/index';
 import { convertCurrency } from '../services/exchangeRateService';
 
-const US_GALLON_TO_LITER = 3.78541;
+const US_GALLON_TO_LITER = 3.785411784; // 1 US gallon = 3.785411784 L
 
 interface Props {
   country: Country;
@@ -45,12 +45,13 @@ const GasolineMode: React.FC<Props> = ({ country, loading }) => {
             <label className="gasoline-mode-label">
               1ガロンあたり
               <input
-                type="number"
+                type="text"
                 inputMode="decimal"
-                step="0.001"
-                min="0"
                 value={priceInput}
-                onChange={(e) => setPriceInput(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '' || /^-?\d*\.?\d*$/.test(v)) setPriceInput(v);
+                }}
                 placeholder="4.399"
                 className="gasoline-mode-input"
               />
@@ -62,12 +63,13 @@ const GasolineMode: React.FC<Props> = ({ country, loading }) => {
             <label className="gasoline-mode-label">
               1リットルあたり
               <input
-                type="number"
+                type="text"
                 inputMode="decimal"
-                step="0.01"
-                min="0"
                 value={priceInput}
-                onChange={(e) => setPriceInput(e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '' || /^-?\d*\.?\d*$/.test(v)) setPriceInput(v);
+                }}
                 placeholder="例: 1500"
                 className="gasoline-mode-input"
               />

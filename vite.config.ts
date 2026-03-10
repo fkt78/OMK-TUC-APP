@@ -38,13 +38,13 @@ export default defineConfig({
         scope: '/OMK-TUC-APP/',
         icons: [
           {
-            src: '/vite.svg',
+            src: 'vite.svg',
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any'
           },
           {
-            src: '/vite.svg',
+            src: 'vite.svg',
             sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'maskable'

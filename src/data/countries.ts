@@ -12,22 +12,23 @@ export const COUNTRIES: { [key: string]: Country } = {
         usd: { name: 'US Dollar', symbol: '$', toBase: (v: number) => v, fromBase: (v: number) => v }
       },
       distance: {
-        mile: { name: 'Mile', symbol: 'mi', toBase: (v: number) => v * 1609.34, fromBase: (v: number) => v / 1609.34 },
+        mile: { name: 'Mile', symbol: 'mi', toBase: (v: number) => v * 1609.344, fromBase: (v: number) => v / 1609.344 },
         foot: { name: 'Foot', symbol: 'ft', toBase: (v: number) => v * 0.3048, fromBase: (v: number) => v / 0.3048 },
         yard: { name: 'Yard', symbol: 'yd', toBase: (v: number) => v * 0.9144, fromBase: (v: number) => v / 0.9144 }
       },
       weight: {
-        pound: { name: 'Pound', symbol: 'lbs', toBase: (v: number) => v * 0.453592, fromBase: (v: number) => v / 0.453592 },
-        ounce: { name: 'Ounce', symbol: 'oz', toBase: (v: number) => v * 0.0283495, fromBase: (v: number) => v / 0.0283495 }
+        pound: { name: 'Pound', symbol: 'lbs', toBase: (v: number) => v * 0.45359237, fromBase: (v: number) => v / 0.45359237 },
+        ounce: { name: 'Ounce', symbol: 'oz', toBase: (v: number) => v * 0.028349523125, fromBase: (v: number) => v / 0.028349523125 }
       },
       temperature: {
         fahrenheit: { name: 'Fahrenheit', symbol: '°F', toBase: (v: number) => (v - 32) * 5/9, fromBase: (v: number) => v * 9/5 + 32 }
       },
       volume: {
-        gallon: { name: 'Gallon (US)', symbol: 'gal', toBase: (v: number) => v * 3.78541, fromBase: (v: number) => v / 3.78541 }
+        // 1 US gallon = 3.785411784 L（29 gal → 109.78 L）
+        gallon: { name: 'Gallon (US)', symbol: 'gal', toBase: (v: number) => v * 3.785411784, fromBase: (v: number) => v / 3.785411784 }
       },
       speed: {
-        milePerHour: { name: 'Miles Per Hour', symbol: 'mph', toBase: (v: number) => v * 1.60934, fromBase: (v: number) => v / 1.60934 }
+        milePerHour: { name: 'Miles Per Hour', symbol: 'mph', toBase: (v: number) => v * 1.609344, fromBase: (v: number) => v / 1.609344 }
       }
     }
   },
