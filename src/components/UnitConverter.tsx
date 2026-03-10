@@ -160,7 +160,7 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
             )}
           </div>
           {isToJp ? (
-            <div className="converter-fixed-unit">
+            <div className="converter-fixed-unit" aria-label={`日本基準: ${jpUnit.name}`}>
               {jpUnit.name} ({jpUnit.symbol})
             </div>
           ) : (

@@ -61,7 +61,7 @@ const ConversionStepBlock: React.FC<Props> = ({
         )}
       </div>
       <UnitConverter
-        key={stepId}
+        key={`${stepId}-${category}`}
         country={country}
         category={category}
         exchangeRates={exchangeRates}
