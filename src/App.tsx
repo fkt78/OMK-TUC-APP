@@ -39,7 +39,7 @@ function App() {
   useEffect(() => {
     const loadRates = async () => {
       setLoading(true);
-      const { rates, updatedAt } = await getExchangeRates('JPY');
+      const { rates, updatedAt } = await getExchangeRates();
       setExchangeRates(rates);
       setRatesUpdatedAt(updatedAt);
       setLoading(false);

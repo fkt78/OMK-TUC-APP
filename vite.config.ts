@@ -16,7 +16,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.exchangerate\.host\/.*/i,
+            urlPattern: /^https:\/\/open\.er-api\.com\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'exchange-rates-cache',
