@@ -38,19 +38,20 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
   useEffect(() => {
     if (!units || unitKeys.length === 0) return;
 
-    const performConversion = async () => {
-      if (!inputValue || inputValue.trim() === '' || isNaN(Number(inputValue))) {
-        setResult(null);
-        return;
-      }
+    const trimmed = inputValue.trim();
+    if (!trimmed || isNaN(Number(trimmed))) {
+      setResult(null);
+      return;
+    }
 
-      const num = Number(inputValue);
-      const unit = safeSelectedUnit || unitKeys[0];
-      const unitData = unit ? units[unit] : null;
+    const num = Number(trimmed);
+    const unit = safeSelectedUnit || unitKeys[0];
+    const unitData = unit ? units[unit] : null;
 
-      if (!unitData) return;
+    if (!unitData) return;
 
-      if (category === 'currency') {
+    if (category === 'currency') {
+      const convert = async () => {
         if (direction === 'toJp') {
           const converted = await convertCurrency(num, unit.toUpperCase(), 'JPY');
           setResult(converted);
@@ -58,19 +59,16 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
           const converted = await convertCurrency(num, 'JPY', unit.toUpperCase());
           setResult(converted);
         }
+      };
+      convert();
+    } else {
+      if (direction === 'toJp') {
+        setResult(unitData.toBase(num));
       } else {
-        if (direction === 'toJp') {
-          const baseValue = unitData.toBase(num);
-          setResult(baseValue);
-        } else {
-          const baseValue = num;
-          setResult(unitData.fromBase(baseValue));
-        }
+        setResult(unitData.fromBase(num));
       }
-    };
-
-    performConversion();
-  }, [inputValue, safeSelectedUnit, unitKeys, direction, category, units]);
+    }
+  }, [inputValue, safeSelectedUnit, direction, category, units, unitKeys.length, unitKeys[0]]);
 
   if (!units || unitKeys.length === 0) {
     return <div className="converter-error">この項目に対応する単位がありません</div>;
