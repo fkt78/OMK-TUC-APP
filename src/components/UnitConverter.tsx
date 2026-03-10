@@ -24,42 +24,29 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
   const unitKeys = units ? Object.keys(units) : [];
 
   const [inputValue, setInputValue] = useState('');
-  const [result, setResult] = useState<number | null>(null);
   const [direction, setDirection] = useState<'toJp' | 'fromJp'>('toJp');
   const [selectedUnit, setSelectedUnit] = useState(unitKeys[0] ?? '');
+  const [currencyResult, setCurrencyResult] = useState<number | null>(null);
 
   const safeUnit = selectedUnit && units?.[selectedUnit] ? selectedUnit : (unitKeys[0] ?? '');
 
-  // 非通貨の換算を同期的に計算して返す純粋関数
-  const calcSync = (input: string, unit: string, dir: 'toJp' | 'fromJp'): number | null => {
-    if (category === 'currency' || !units) return null;
-    const trimmed = input.trim();
-    if (!trimmed || isNaN(Number(trimmed))) return null;
-    const num = Number(trimmed);
-    const unitData = units[unit];
-    if (!unitData) return null;
-    return dir === 'toJp' ? unitData.toBase(num) : unitData.fromBase(num);
-  };
-
-  // 国・カテゴリが変わったときにリセット
   useEffect(() => {
     setInputValue('');
-    setResult(null);
+    setCurrencyResult(null);
     setSelectedUnit(unitKeys[0] ?? '');
   }, [country.id, category]);
 
-  // 通貨のみ非同期API換算（inputValue/safeUnit/directionが変わったとき）
   useEffect(() => {
     if (category !== 'currency') return;
     const trimmed = inputValue.trim();
-    if (!trimmed || isNaN(Number(trimmed))) { setResult(null); return; }
+    if (!trimmed || isNaN(Number(trimmed))) { setCurrencyResult(null); return; }
     const num = Number(trimmed);
     let cancelled = false;
     const convert = async () => {
       const converted = direction === 'toJp'
         ? await convertCurrency(num, safeUnit.toUpperCase(), 'JPY')
         : await convertCurrency(num, 'JPY', safeUnit.toUpperCase());
-      if (!cancelled) setResult(converted);
+      if (!cancelled) setCurrencyResult(converted);
     };
     convert();
     return () => { cancelled = true; };
@@ -69,25 +56,23 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
     return <div className="converter-error">この項目に対応する単位がありません</div>;
   }
 
+  // 通貨以外: state を介さず、render のたびに inputValue から直接計算する
+  let result: number | null = null;
+  if (category === 'currency') {
+    result = currencyResult;
+  } else {
+    const trimmed = inputValue.trim();
+    if (trimmed && !isNaN(Number(trimmed))) {
+      const num = Number(trimmed);
+      const unitData = units[safeUnit];
+      if (unitData) {
+        result = direction === 'toJp' ? unitData.toBase(num) : unitData.fromBase(num);
+      }
+    }
+  }
+
   const jpUnit = JAPANESE_UNITS[category];
   const isToJp = direction === 'toJp';
-
-  // イベントハンドラ: 入力・単位・方向が変わったとき、非通貨は同期で即計算
-  const handleInputChange = (v: string) => {
-    if (v !== '' && !/^-?\d*\.?\d*$/.test(v)) return;
-    setInputValue(v);
-    if (category !== 'currency') setResult(calcSync(v, safeUnit, direction));
-  };
-
-  const handleUnitChange = (unit: string) => {
-    setSelectedUnit(unit);
-    if (category !== 'currency') setResult(calcSync(inputValue, unit, direction));
-  };
-
-  const handleDirectionChange = (dir: 'toJp' | 'fromJp') => {
-    setDirection(dir);
-    if (category !== 'currency') setResult(calcSync(inputValue, safeUnit, dir));
-  };
 
   const formatResult = (value: number) => {
     if (category === 'currency') {
@@ -106,14 +91,14 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
         <button
           type="button"
           className={`converter-direction-btn ${isToJp ? 'active' : ''}`}
-          onClick={() => handleDirectionChange('toJp')}
+          onClick={() => setDirection('toJp')}
         >
           現地 → 日本
         </button>
         <button
           type="button"
           className={`converter-direction-btn ${!isToJp ? 'active' : ''}`}
-          onClick={() => handleDirectionChange('fromJp')}
+          onClick={() => setDirection('fromJp')}
         >
           日本 → 現地
         </button>
@@ -125,14 +110,17 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
             type="text"
             inputMode="decimal"
             value={inputValue}
-            onChange={(e) => handleInputChange(e.target.value)}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === '' || /^-?\d*\.?\d*$/.test(v)) setInputValue(v);
+            }}
             placeholder="数値を入力"
             className="converter-input"
           />
           {isToJp ? (
             <select
               value={safeUnit}
-              onChange={(e) => handleUnitChange(e.target.value)}
+              onChange={(e) => setSelectedUnit(e.target.value)}
               className="converter-select"
             >
               {unitKeys.map((key) => (
@@ -170,7 +158,7 @@ const UnitConverter: React.FC<Props> = ({ country, category, exchangeRates: _exc
           ) : (
             <select
               value={safeUnit}
-              onChange={(e) => handleUnitChange(e.target.value)}
+              onChange={(e) => setSelectedUnit(e.target.value)}
               className="converter-select"
             >
               {unitKeys.map((key) => (
